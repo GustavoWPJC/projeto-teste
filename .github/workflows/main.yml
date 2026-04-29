@@ -24,14 +24,14 @@ jobs:
 
       - name: Rodando os testes da Petstore
         run: |
-          newman run api-tests/petstore-collection.json \
-            --environment api-tests/petstore-environment.json \
+          newman run petstore-collection.json \
+            --environment petstore-environment.json \
             --reporters cli,htmlextra \
-            --reporter-htmlextra-export api-tests/report.html
+            --reporter-htmlextra-export report.html
 
       - name: Salvando o relatório
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: api-test-report
-          path: api-tests/report.html
+          path: report.html
