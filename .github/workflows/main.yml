@@ -26,6 +26,7 @@ jobs:
         run: |
           newman run petstore-collection.json \
             --environment petstore-environment.json \
+            --working-dir assets \
             --reporters cli,htmlextra \
             --reporter-htmlextra-export report.html
 

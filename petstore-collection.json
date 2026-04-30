@@ -92,7 +92,7 @@
 					"response": []
 				},
 				{
-					"name": "Modify",
+					"name": "FindById",
 					"event": [
 						{
 							"listen": "test",
@@ -104,23 +104,15 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"O tipo de resposta é um object\", function(){",
+									"pm.test(\"O tipo da resposta é object\", function(){",
 									"    pm.expect(jsonData).to.be.an('object');",
 									"})",
 									"",
-									"pm.test(\"O nome do pet foi atualizado\", function(){",
-									"    pm.expect(jsonData.name).to.equal(\"Bellinha Atualizada\");",
-									"})",
-									"",
-									"pm.test(\"O status do pet foi atualizado para sold\", function(){",
-									"    pm.expect(jsonData.status).to.equal(\"sold\");",
-									"})",
-									"",
-									"pm.test(\"O id do pet não foi alterado\", function(){",
+									"pm.test(\"O id do pet é o correto\", function(){",
 									"    pm.expect(jsonData.id).to.equal(pm.environment.get(\"petId\"));",
 									"})",
 									"",
-									"pm.test(\"O tempo de resposta é menor que 300ms\", function(){",
+									"pm.test(\"O tempo de resposta é abaixo de 300ms\", function(){",
 									"    pm.expect(pm.response.responseTime).to.be.below(300);",
 									"})"
 								],
@@ -131,24 +123,16 @@
 						}
 					],
 					"request": {
-						"method": "PUT",
+						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"id\": {{petId}},\n    \"name\": \"Bellinha Atualizada\",\n    \"status\": \"sold\",\n    \"category\": {\"id\": 1, \"name\": \"Dogs\"},\n    \"photoUrls\": [\"https://example.com/photo.jpg\"],\n    \"tags\": [{\"id\": 1, \"name\": \"tag1\"}]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "{{BASE_URL}}/pet",
+							"raw": "{{BASE_URL}}/pet/{{petId}}",
 							"host": [
 								"{{BASE_URL}}"
 							],
 							"path": [
-								"pet"
+								"pet",
+								"{{petId}}"
 							]
 						}
 					},
@@ -226,7 +210,7 @@
 					"response": []
 				},
 				{
-					"name": "FindById",
+					"name": "Modify",
 					"event": [
 						{
 							"listen": "test",
@@ -238,15 +222,23 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"O tipo da resposta é object\", function(){",
+									"pm.test(\"O tipo de resposta é um object\", function(){",
 									"    pm.expect(jsonData).to.be.an('object');",
 									"})",
 									"",
-									"pm.test(\"O id do pet é o correto\", function(){",
+									"pm.test(\"O nome do pet foi atualizado\", function(){",
+									"    pm.expect(jsonData.name).to.equal(\"Bellinha Atualizada\");",
+									"})",
+									"",
+									"pm.test(\"O status do pet foi atualizado para sold\", function(){",
+									"    pm.expect(jsonData.status).to.equal(\"sold\");",
+									"})",
+									"",
+									"pm.test(\"O id do pet não foi alterado\", function(){",
 									"    pm.expect(jsonData.id).to.equal(pm.environment.get(\"petId\"));",
 									"})",
 									"",
-									"pm.test(\"O tempo de resposta é abaixo de 300ms\", function(){",
+									"pm.test(\"O tempo de resposta é menor que 300ms\", function(){",
 									"    pm.expect(pm.response.responseTime).to.be.below(300);",
 									"})"
 								],
@@ -257,16 +249,154 @@
 						}
 					],
 					"request": {
-						"method": "GET",
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": {{petId}},\n    \"name\": \"Bellinha Atualizada\",\n    \"status\": \"sold\",\n    \"category\": {\"id\": 1, \"name\": \"Dogs\"},\n    \"photoUrls\": [\"https://example.com/photo.jpg\"],\n    \"tags\": [{\"id\": 1, \"name\": \"tag1\"}]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/pet",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"pet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modify form",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"O status code é 200\", function(){",
+									"    pm.expect(pm.response.code).to.eql(200)",
+									"});",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function(){",
+									"    pm.expect(jsonData).to.have.property(\"code\");",
+									"    pm.expect(jsonData).to.have.property(\"type\");",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});",
+									"",
+									"pm.test(\"O pet alterado foi o correto\", function(){",
+									"    pm.expect(jsonData.message).to.eql(pm.environment.get(\"petId\").toString())",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é abaixo de 300ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(300)",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{BASE_URL}}/pet/{{petId}}",
+							"raw": "{{BASE_URL}}/pet/{{petId}}?name=Belinha Form&status=pending",
 							"host": [
 								"{{BASE_URL}}"
 							],
 							"path": [
 								"pet",
 								"{{petId}}"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Belinha Form"
+								},
+								{
+									"key": "status",
+									"value": "pending"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload image",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function () {",
+									"    pm.expect(jsonData).to.have.property(\"code\");",
+									"    pm.expect(jsonData).to.have.property(\"type\");",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});",
+									"",
+									"pm.test(\"O upload foi realizado com sucesso\", function () {",
+									"    pm.expect(jsonData.message).to.include(\"File uploaded to\");",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é menor que 500ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "test.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/pet/{{petId}}/uploadImage",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"pet",
+								"{{petId}}",
+								"uploadImage"
 							]
 						}
 					},
@@ -279,8 +409,24 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
 									"pm.test(\"Status code é 200\", function () {",
 									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function(){",
+									"    pm.expect(jsonData).to.have.property(\"code\");",
+									"    pm.expect(jsonData).to.have.property(\"type\");",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});",
+									"",
+									"pm.test(\"O id correto foi deletado\", function(){",
+									"    pm.expect(jsonData.message).to.eql(pm.environment.get(\"petId\").toString());",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é abaixo de 300ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(300);",
 									"});"
 								],
 								"type": "text/javascript",
