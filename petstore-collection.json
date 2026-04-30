@@ -384,7 +384,7 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "/home/gustavo/Área de trabalho/codigos/Icev/test_project/projeto-teste/assets/test.png"
+									"src": "test.png"
 								}
 							]
 						},
