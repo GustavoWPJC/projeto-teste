@@ -11,33 +11,297 @@
 			"item": [
 				{
 					"name": "Create",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"petId\", Math.floor(Math.random() * 900000) + 100000);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json()",
+									"",
+									"pm.test(\"Status code é 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Pet criado com o nome correto\", function(){",
+									"    pm.expect(jsonData.name).to.eql(\"Bellinha\")",
+									"})",
+									"",
+									"pm.test(\"O status do pet é available\", function(){",
+									"    pm.expect(jsonData.status).to.eql(\"available\")",
+									"})",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function(){",
+									"",
+									"    pm.expect(jsonData).to.have.property(\"id\")",
+									"    pm.expect(jsonData).to.have.property(\"category\")",
+									"    pm.expect(jsonData).to.have.property(\"name\")",
+									"    pm.expect(jsonData).to.have.property(\"photoUrls\")",
+									"    pm.expect(jsonData).to.have.property(\"tags\")",
+									"    pm.expect(jsonData).to.have.property(\"status\")",
+									"})",
+									"",
+									"pm.test(\"O tipo de resposta é object\", function(){",
+									"    pm.expect(jsonData).to.be.an('object')",
+									"})",
+									"",
+									"pm.test(\"O tempo de respost é abaixo de 300\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(300)",
+									"})",
+									"",
+									"pm.environment.set(\"petId\", jsonData.id)"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\n        \"id\": {{petId}},\n        \"name\": \"Bellinha\",\n        \"status\": \"available\",\n        \"category\": {\"id\": 1, \"name\": \"Dogs\"},\n        \"photoUrls\": [\"https://example.com/photo.jpg\"],\n        \"tags\": [{\"id\": 1, \"name\": \"tag1\"}]\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/pet",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"pet"
+							]
+						}
 					},
 					"response": []
 				},
 				{
 					"name": "Modify",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"O tipo de resposta é um object\", function(){",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"})",
+									"",
+									"pm.test(\"O nome do pet foi atualizado\", function(){",
+									"    pm.expect(jsonData.name).to.equal(\"Bellinha Atualizada\");",
+									"})",
+									"",
+									"pm.test(\"O status do pet foi atualizado para sold\", function(){",
+									"    pm.expect(jsonData.status).to.equal(\"sold\");",
+									"})",
+									"",
+									"pm.test(\"O id do pet não foi alterado\", function(){",
+									"    pm.expect(jsonData.id).to.equal(pm.environment.get(\"petId\"));",
+									"})",
+									"",
+									"pm.test(\"O tempo de resposta é menor que 300ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(300);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": {{petId}},\n    \"name\": \"Bellinha Atualizada\",\n    \"status\": \"sold\",\n    \"category\": {\"id\": 1, \"name\": \"Dogs\"},\n    \"photoUrls\": [\"https://example.com/photo.jpg\"],\n    \"tags\": [{\"id\": 1, \"name\": \"tag1\"}]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/pet",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"pet"
+							]
+						}
 					},
 					"response": []
 				},
 				{
 					"name": "FindByStatus",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json()",
+									"",
+									"pm.test(\"Status code é 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"O tipo de resposta é ARRAY\", function () {",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"O array não está vazio\", function(){",
+									"    pm.expect(jsonData.length).to.be.above(0);",
+									"});",
+									"",
+									"pm.test(\"Todos os pets tem status available\", function(){",
+									"    jsonData.slice(0, 10).forEach(function(pet){",
+									"        pm.expect(pet.status).to.eql('available');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"O tempo da resposta é menor que 500ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/pet/findByStatus?status=available",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"pet",
+								"findByStatus"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "available"
+								}
+							]
+						}
 					},
 					"response": []
 				},
 				{
 					"name": "FindById",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"O tipo da resposta é object\", function(){",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"})",
+									"",
+									"pm.test(\"O id do pet é o correto\", function(){",
+									"    pm.expect(jsonData.id).to.equal(pm.environment.get(\"petId\"));",
+									"})",
+									"",
+									"pm.test(\"O tempo de resposta é abaixo de 300ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(300);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/pet/{{petId}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"pet",
+								"{{petId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code é 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/pet/{{petId}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"pet",
+								"{{petId}}"
+							]
+						}
 					},
 					"response": []
 				}
