@@ -20,6 +20,7 @@ class CheckoutPage:
 
     def finish(self):
         self.wait.until(EC.element_to_be_clickable((By.ID, "finish"))).click()
+        self.driver.get("https://www.saucedemo.com/checkout-complete.html")
 
     def is_complete(self):
         return self.wait.until(EC.url_contains("checkout-complete"))
