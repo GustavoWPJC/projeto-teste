@@ -15,11 +15,10 @@ class CheckoutPage:
         self.wait.until(EC.presence_of_element_located((By.ID, "first-name"))).send_keys(first_name)
         self.driver.find_element(By.ID, "last-name").send_keys(last_name)
         self.driver.find_element(By.ID, "postal-code").send_keys(postal_code)
-        self.driver.find_element(By.ID, "continue").click()
+        self.wait.until(EC.element_to_be_clickable((By.ID, "continue"))).click()
 
     def finish(self):
-        self.wait.until(EC.url_contains("checkout-step-two"))
-        self.driver.find_element(By.ID, "finish").click()
+        self.wait.until(EC.element_to_be_clickable((By.ID, "finish"))).click()
 
     def is_complete(self):
         return self.wait.until(EC.url_contains("checkout-complete"))
