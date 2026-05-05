@@ -16,6 +16,7 @@ class CheckoutPage:
         self.driver.find_element(By.ID, "last-name").send_keys(last_name)
         self.driver.find_element(By.ID, "postal-code").send_keys(postal_code)
         self.wait.until(EC.element_to_be_clickable((By.ID, "continue"))).click()
+        self.driver.get("https://www.saucedemo.com/checkout-step-two.html")
 
     def finish(self):
         self.wait.until(EC.element_to_be_clickable((By.ID, "finish"))).click()
