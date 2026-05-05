@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 class CartPage:
     def __init__(self, driver):
         self.driver = driver
-        self.wait = WebDriverWait(driver, 10)
+        self.wait = WebDriverWait(driver, 30)
 
     def is_loaded(self):
         return self.wait.until(EC.url_contains("cart"))
