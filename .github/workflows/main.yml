@@ -1,4 +1,4 @@
-name: Testes Automatizados Postman
+name: Testes Automatizados
 
 on:
   push:
@@ -36,3 +36,38 @@ jobs:
         with:
           name: api-test-report
           path: report.html
+
+  run-web-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixando os arquivos do repositório
+        uses: actions/checkout@v4
+
+      - name: Instalando o Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalando as dependências
+        working-directory: web-tests
+        run: pip install -r requirements.txt
+
+      - name: Instalando o Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Criando o arquivo .env
+        run: |
+          echo "LOGIN_USER=${{ secrets.LOGIN_USER }}" >> web-tests/.env
+          echo "LOGIN_PASSWORD=${{ secrets.LOGIN_PASSWORD }}" >> web-tests/.env
+
+      - name: Rodando os testes Selenium
+        working-directory: web-tests
+        run: pytest
+
+      - name: Salvando o relatório
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-test-report
+          path: web-tests/report.html
