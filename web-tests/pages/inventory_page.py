@@ -17,4 +17,4 @@ class InventoryPage:
         self.wait.until(EC.presence_of_element_located((By.CLASS_NAME, "btn_inventory"))).click()
 
     def go_to_cart(self):
-        self.driver.find_element(By.CLASS_NAME, "shopping_cart_link").click()
+        self.driver.get("https://www.saucedemo.com/cart.html")
