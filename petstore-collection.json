@@ -1,39 +1,1203 @@
 {
-	"id": "86f20cc9-3cc0-4a45-b59b-91a12b46e9b3",
-	"name": "Petstore QA",
-	"values": [
+	"info": {
+		"_postman_id": "bfec3e57-fded-4233-a401-22314147d235",
+		"name": "Test-project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44519750"
+	},
+	"item": [
 		{
-			"key": "BASE_URL",
-			"value": "https://petstore.swagger.io/v2",
-			"type": "default",
-			"enabled": true
+			"name": "Pet",
+			"item": [
+				{
+					"name": "Create",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"petId\", Math.floor(Math.random() * 900000) + 100000);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json()",
+									"",
+									"pm.test(\"Status code é 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Pet criado com o nome correto\", function(){",
+									"    pm.expect(jsonData.name).to.eql(\"Bellinha\")",
+									"})",
+									"",
+									"pm.test(\"O status do pet é available\", function(){",
+									"    pm.expect(jsonData.status).to.eql(\"available\")",
+									"})",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function(){",
+									"",
+									"    pm.expect(jsonData).to.have.property(\"id\")",
+									"    pm.expect(jsonData).to.have.property(\"category\")",
+									"    pm.expect(jsonData).to.have.property(\"name\")",
+									"    pm.expect(jsonData).to.have.property(\"photoUrls\")",
+									"    pm.expect(jsonData).to.have.property(\"tags\")",
+									"    pm.expect(jsonData).to.have.property(\"status\")",
+									"})",
+									"",
+									"pm.test(\"O tipo de resposta é object\", function(){",
+									"    pm.expect(jsonData).to.be.an('object')",
+									"})",
+									"",
+									"pm.test(\"O tempo de respost é abaixo de 500\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(500)",
+									"})",
+									"",
+									"pm.environment.set(\"petId\", jsonData.id)"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "    {\n        \"id\": {{petId}},\n        \"name\": \"Bellinha\",\n        \"status\": \"available\",\n        \"category\": {\"id\": 1, \"name\": \"Dogs\"},\n        \"photoUrls\": [\"https://example.com/photo.jpg\"],\n        \"tags\": [{\"id\": 1, \"name\": \"tag1\"}]\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/pet",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"pet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "FindById",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"O tipo da resposta é object\", function(){",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"})",
+									"",
+									"pm.test(\"O id do pet é o correto\", function(){",
+									"    pm.expect(jsonData.id).to.equal(pm.environment.get(\"petId\"));",
+									"})",
+									"",
+									"pm.test(\"O tempo de resposta é abaixo de 500ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/pet/{{petId}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"pet",
+								"{{petId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "FindByStatus",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json()",
+									"",
+									"pm.test(\"Status code é 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"O tipo de resposta é ARRAY\", function () {",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"O array não está vazio\", function(){",
+									"    pm.expect(jsonData.length).to.be.above(0);",
+									"});",
+									"",
+									"pm.test(\"Todos os pets tem status available\", function(){",
+									"    jsonData.slice(0, 10).forEach(function(pet){",
+									"        pm.expect(pet.status).to.eql('available');",
+									"    });",
+									"});",
+									"",
+									"pm.test(\"O tempo da resposta é menor que 500ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/pet/findByStatus?status=available",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"pet",
+								"findByStatus"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "available"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modify",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"O tipo de resposta é um object\", function(){",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"})",
+									"",
+									"pm.test(\"O nome do pet foi atualizado\", function(){",
+									"    pm.expect(jsonData.name).to.equal(\"Bellinha Atualizada\");",
+									"})",
+									"",
+									"pm.test(\"O status do pet foi atualizado para sold\", function(){",
+									"    pm.expect(jsonData.status).to.equal(\"sold\");",
+									"})",
+									"",
+									"pm.test(\"O id do pet não foi alterado\", function(){",
+									"    pm.expect(jsonData.id).to.equal(pm.environment.get(\"petId\"));",
+									"})",
+									"",
+									"pm.test(\"O tempo de resposta é menor que 500ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": {{petId}},\n    \"name\": \"Bellinha Atualizada\",\n    \"status\": \"sold\",\n    \"category\": {\"id\": 1, \"name\": \"Dogs\"},\n    \"photoUrls\": [\"https://example.com/photo.jpg\"],\n    \"tags\": [{\"id\": 1, \"name\": \"tag1\"}]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/pet",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"pet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modify form",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"O status code é 200\", function(){",
+									"    pm.expect(pm.response.code).to.eql(200)",
+									"});",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function(){",
+									"    pm.expect(jsonData).to.have.property(\"code\");",
+									"    pm.expect(jsonData).to.have.property(\"type\");",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});",
+									"",
+									"pm.test(\"O pet alterado foi o correto\", function(){",
+									"    pm.expect(jsonData.message).to.eql(pm.environment.get(\"petId\").toString())",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é abaixo de 500ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(500)",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"packages": {},
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/pet/{{petId}}?name=Belinha Form&status=pending",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"pet",
+								"{{petId}}"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Belinha Form"
+								},
+								{
+									"key": "status",
+									"value": "pending"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload image",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function () {",
+									"    pm.expect(jsonData).to.have.property(\"code\");",
+									"    pm.expect(jsonData).to.have.property(\"type\");",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});",
+									"",
+									"pm.test(\"O upload foi realizado com sucesso\", function () {",
+									"    pm.expect(jsonData.message).to.include(\"File uploaded to\");",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é menor que 600ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(600);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/home/gustavo/Downloads/gato.webp"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/pet/{{petId}}/uploadImage",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"pet",
+								"{{petId}}",
+								"uploadImage"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function(){",
+									"    pm.expect(jsonData).to.have.property(\"code\");",
+									"    pm.expect(jsonData).to.have.property(\"type\");",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});",
+									"",
+									"pm.test(\"O id correto foi deletado\", function(){",
+									"    pm.expect(jsonData.message).to.eql(pm.environment.get(\"petId\").toString());",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é abaixo de 300ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(300);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/pet/{{petId}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"pet",
+								"{{petId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		},
 		{
-			"key": "petId",
-			"value": 456698,
-			"type": "any",
-			"enabled": true
+			"name": "Store",
+			"item": [
+				{
+					"name": "Inventroy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function(){",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"O tipo de resposta é um objeto\", function () {",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"})",
+									"",
+									"pm.test(\"O inventário não está vazio\", function(){",
+									"    pm.expect(Object.keys(jsonData).length).to.be.above(0);",
+									"});",
+									"",
+									"pm.test(\"O status available existe no inventário\", function(){",
+									"    pm.expect(jsonData).to.have.property(\"available\");",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é menor que 500ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/store/inventory",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"store",
+								"inventory"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Order",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"orderId\", Math.floor(Math.random() * 900000) + 100000);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function(){",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"O tipo de resposta é um object\", function(){",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"});",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function(){",
+									"    pm.expect(jsonData).to.have.property(\"id\");",
+									"    pm.expect(jsonData).to.have.property(\"petId\");",
+									"    pm.expect(jsonData).to.have.property(\"quantity\");",
+									"    pm.expect(jsonData).to.have.property(\"shipDate\");",
+									"    pm.expect(jsonData).to.have.property(\"status\");",
+									"    pm.expect(jsonData).to.have.property(\"complete\");",
+									"});",
+									"",
+									"pm.test(\"O status do pedido é placed\", function(){",
+									"    pm.expect(jsonData.status).to.eql(\"placed\");",
+									"});",
+									"",
+									"pm.test(\"A quantidade do pedido é 1\", function(){",
+									"    pm.expect(jsonData.quantity).to.eql(1);",
+									"});",
+									"",
+									"pm.environment.set(\"orderId\", jsonData.id);",
+									"",
+									"pm.test(\"O tempo de resposta é menor que 500ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": {{orderId}},\n    \"petId\": {{petId}},\n    \"quantity\": 1,\n    \"shipDate\": \"2026-01-01T00:00:00.000Z\",\n    \"status\": \"placed\",\n    \"complete\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/store/order",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"store",
+								"order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function(){",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"O tipo de resposta é um object\", function(){",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"});",
+									"",
+									"pm.test(\"O id do pedido é o correto\", function(){",
+									"    pm.expect(jsonData.id).to.eql(pm.environment.get(\"orderId\"));",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é menor que 500ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/store/order/{{orderId}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"store",
+								"order",
+								"{{orderId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function(){",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function(){",
+									"    pm.expect(jsonData).to.have.property(\"code\");",
+									"    pm.expect(jsonData).to.have.property(\"type\");",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});",
+									"",
+									"pm.test(\"O pedido correto foi deletado\", function(){",
+									"    pm.expect(jsonData.message).to.eql(pm.environment.get(\"orderId\").toString());",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é menor que 300ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(300);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/store/order/{{orderId}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"store",
+								"order",
+								"{{orderId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		},
 		{
-			"key": "orderId",
-			"value": "",
-			"type": "any",
-			"enabled": true
-		},
-		{
-			"key": "userId",
-			"value": "",
-			"type": "any",
-			"enabled": true
-		},
-		{
-			"key": "username",
-			"value": "",
-			"type": "any",
-			"enabled": true
+			"name": "User",
+			"item": [
+				{
+					"name": "Create",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"userId\", Math.floor(Math.random() * 900000) + 100000);",
+									"pm.environment.set(\"username\", \"bellinha_test\");"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function(){",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function(){",
+									"    pm.expect(jsonData).to.have.property(\"code\");",
+									"    pm.expect(jsonData).to.have.property(\"type\");",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});",
+									"",
+									"pm.test(\"O tipo de resposta é um object\", function(){",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é menor que 500ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": {{userId}},\n    \"username\": \"bellinha_test\",\n    \"firstName\": \"Bellinha\",\n    \"lastName\": \"Test\",\n    \"email\": \"bellinha@test.com\",\n    \"password\": \"senha123\",\n    \"phone\": \"11999999999\",\n    \"userStatus\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/user",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateWithArray",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function(){",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"O tipo de resposta é um object\", function(){",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"});",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function(){",
+									"    pm.expect(jsonData).to.have.property(\"code\");",
+									"    pm.expect(jsonData).to.have.property(\"type\");",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});",
+									"",
+									"pm.test(\"Os usuários foram criados com sucesso\", function(){",
+									"    pm.expect(jsonData.message).to.eql(\"ok\");",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é menor que 500ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n        \"id\": 1,\n        \"username\": \"user_array1\",\n        \"firstName\": \"User\",\n        \"lastName\": \"Array1\",\n        \"email\": \"userarray1@test.com\",\n        \"password\": \"senha123\",\n        \"phone\": \"11999999999\",\n        \"userStatus\": 1\n    },\n    {\n        \"id\": 2,\n        \"username\": \"user_array2\",\n        \"firstName\": \"User\",\n        \"lastName\": \"Array2\",\n        \"email\": \"userarray2@test.com\",\n        \"password\": \"senha123\",\n        \"phone\": \"11999999999\",\n        \"userStatus\": 1\n    }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/user/createWithArray",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"user",
+								"createWithArray"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateWithList",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function(){",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"O tipo de resposta é um object\", function(){",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"});",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function(){",
+									"    pm.expect(jsonData).to.have.property(\"code\");",
+									"    pm.expect(jsonData).to.have.property(\"type\");",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});",
+									"",
+									"pm.test(\"Os usuários foram criados com sucesso\", function(){",
+									"    pm.expect(jsonData.message).to.eql(\"ok\");",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é menor que 500ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n        \"id\": 3,\n        \"username\": \"user_list1\",\n        \"firstName\": \"User\",\n        \"lastName\": \"List1\",\n        \"email\": \"userlist1@test.com\",\n        \"password\": \"senha123\",\n        \"phone\": \"11999999999\",\n        \"userStatus\": 1\n    },\n    {\n        \"id\": 4,\n        \"username\": \"user_list2\",\n        \"firstName\": \"User\",\n        \"lastName\": \"List2\",\n        \"email\": \"userlist2@test.com\",\n        \"password\": \"senha123\",\n        \"phone\": \"11999999999\",\n        \"userStatus\": 1\n    }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/user/createWithList",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"user",
+								"createWithList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function(){",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"O tipo de resposta é um object\", function(){",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"});",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function(){",
+									"    pm.expect(jsonData).to.have.property(\"code\");",
+									"    pm.expect(jsonData).to.have.property(\"type\");",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});",
+									"",
+									"pm.test(\"O login foi realizado com sucesso\", function(){",
+									"    pm.expect(jsonData.message).to.include(\"logged in user session\");",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é menor que 500ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/user/login?username={{username}}&password=senha123",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"user",
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "{{username}}"
+								},
+								{
+									"key": "password",
+									"value": "senha123"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "FindByName",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function(){",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"O tipo de resposta é um object\", function(){",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"});",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function(){",
+									"    pm.expect(jsonData).to.have.property(\"id\");",
+									"    pm.expect(jsonData).to.have.property(\"username\");",
+									"    pm.expect(jsonData).to.have.property(\"firstName\");",
+									"    pm.expect(jsonData).to.have.property(\"lastName\");",
+									"    pm.expect(jsonData).to.have.property(\"email\");",
+									"    pm.expect(jsonData).to.have.property(\"password\");",
+									"    pm.expect(jsonData).to.have.property(\"phone\");",
+									"    pm.expect(jsonData).to.have.property(\"userStatus\");",
+									"});",
+									"",
+									"pm.test(\"O username é o correto\", function(){",
+									"    pm.expect(jsonData.username).to.eql(pm.environment.get(\"username\"));",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é menor que 500ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/user/{{username}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"user",
+								"{{username}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modify",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function(){",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"O tipo de resposta é um object\", function(){",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"});",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function(){",
+									"    pm.expect(jsonData).to.have.property(\"code\");",
+									"    pm.expect(jsonData).to.have.property(\"type\");",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});",
+									"",
+									"pm.test(\"O usuário atualizado foi o correto\", function(){",
+									"    pm.expect(jsonData.message).to.eql(pm.environment.get(\"userId\").toString());",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é menor que 500ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": {{userId}},\n    \"username\": \"bellinha_test\",\n    \"firstName\": \"Bellinha Atualizada\",\n    \"lastName\": \"Test\",\n    \"email\": \"bellinha_atualizada@test.com\",\n    \"password\": \"senha123\",\n    \"phone\": \"11999999999\",\n    \"userStatus\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/user/{{username}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"user",
+								"{{username}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function(){",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"O tipo de resposta é um object\", function(){",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"});",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function(){",
+									"    pm.expect(jsonData).to.have.property(\"code\");",
+									"    pm.expect(jsonData).to.have.property(\"type\");",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});",
+									"",
+									"pm.test(\"O logout foi realizado com sucesso\", function(){",
+									"    pm.expect(jsonData.message).to.eql(\"ok\");",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é menor que 500ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/user/logout",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"user",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"",
+									"pm.test(\"Status code é 200\", function(){",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"O tipo de resposta é um object\", function(){",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"});",
+									"",
+									"pm.test(\"A estrutura do json é válida\", function(){",
+									"    pm.expect(jsonData).to.have.property(\"code\");",
+									"    pm.expect(jsonData).to.have.property(\"type\");",
+									"    pm.expect(jsonData).to.have.property(\"message\");",
+									"});",
+									"",
+									"pm.test(\"O usuário deletado foi o correto\", function(){",
+									"    pm.expect(jsonData.message).to.eql(pm.environment.get(\"username\"));",
+									"});",
+									"",
+									"pm.test(\"O tempo de resposta é menor que 300ms\", function(){",
+									"    pm.expect(pm.response.responseTime).to.be.below(300);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/user/{{username}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"user",
+								"{{username}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
-	],
-	"_postman_variable_scope": "environment",
-	"_postman_exported_at": "2026-05-03T08:38:33.186Z",
-	"_postman_exported_using": "Postman/11.72.3"
+	]
 }
