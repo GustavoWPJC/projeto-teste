@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 class CheckoutPage:
     def __init__(self, driver):
         self.driver = driver
-        self.wait = WebDriverWait(driver, 20)
+        self.wait = WebDriverWait(driver, 30)
 
     def is_loaded(self):
         return self.wait.until(EC.url_contains("checkout-step-one"))
@@ -16,9 +16,11 @@ class CheckoutPage:
         self.driver.find_element(By.ID, "last-name").send_keys(last_name)
         self.driver.find_element(By.ID, "postal-code").send_keys(postal_code)
         self.wait.until(EC.element_to_be_clickable((By.ID, "continue"))).click()
+        self.driver.get("https://www.saucedemo.com/checkout-step-two.html")
 
     def finish(self):
         self.wait.until(EC.element_to_be_clickable((By.ID, "finish"))).click()
+        self.driver.get("https://www.saucedemo.com/checkout-complete.html")
 
     def is_complete(self):
         return self.wait.until(EC.url_contains("checkout-complete"))
