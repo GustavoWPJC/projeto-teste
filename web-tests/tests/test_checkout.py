@@ -68,5 +68,8 @@ class TestCheckout:
         checkout_page = CheckoutPage(driver)
         assert checkout_page.is_loaded()
         checkout_page.fill_info("Gustavo", "Silva", "12345")
+
+        driver.save_screenshot("screenshot.png")
+
         checkout_page.finish()
         assert checkout_page.is_complete()
