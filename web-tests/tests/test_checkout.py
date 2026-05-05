@@ -17,10 +17,13 @@ PASSWORD = os.getenv("LOGIN_PASSWORD")
 @pytest.fixture
 def driver():
     options = Options()
-    options.binary_location = "/usr/bin/brave-browser"
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+
+    brave_path = "/usr/bin/brave-browser"
+    if os.path.exists(brave_path):
+        options.binary_location = brave_path
 
     driver = webdriver.Chrome(options=options)
     yield driver
